@@ -4,13 +4,17 @@
 # Level is a string that indicates the administrative level to create the panel
 # E.g. level="GID_1" for the first administrative division
 
-create_panels <- function(regions_aff_all, level) {
+create_panels <- function(regions_aff_all, level, thres) {
 
   # Country codes where DHS-MICS data are available
   ccodes <- read_excel("data/country-codes.xlsx")
   
   # Years of cyclone data
   years <- data.frame(year = 1980:2015)
+  
+  # Create directories
+  dir.create(paste0("data/panel_plots/", level, "-", thres), showWarnings = FALSE)
+  dir.create(paste0("data/panel_dat/", level, "-", thres), showWarnings = FALSE)
   
   for (iso in ccodes$iso3) {
   
@@ -21,7 +25,7 @@ create_panels <- function(regions_aff_all, level) {
     
     # Get GADM regions
     lvl <- as.numeric(substr(level, 5,5))
-    regions <- gadm(iso, level = lvl, "data")
+    regions <- gadm(iso, level = lvl, "data", version="3.6")
     
     # If regions are not available at this level, skip it
     if (is.null(regions)) {
@@ -47,7 +51,7 @@ create_panels <- function(regions_aff_all, level) {
     panel_dat_merged$cyclone <- ifelse(is.na(panel_dat_merged$cyclone), 0, panel_dat_merged$cyclone)
     
     # Save the panel data
-    saveRDS(panel_dat_merged, paste0("data/panel_dat/", iso, "_", level, ".rds"))
+    saveRDS(panel_dat_merged, paste0("data/panel_dat/", level, "-", thres, "/", iso, ".rds"))
     
     # Plot the panel for country
     panel_dat_merged$cyclone_plot <- factor(panel_dat_merged$cyclone, levels = c(0, 1), labels = c("No Cyclone", "Cyclone"))
@@ -59,7 +63,7 @@ create_panels <- function(regions_aff_all, level) {
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
     
     # Save the panel plot
-    ggsave(paste0("data/panel_plots/", iso, "_", level, ".jpeg"), plot,
+    ggsave(paste0("data/panel_plots/", level, "-", thres, "/", iso, ".jpeg"), plot,
            height = 6, width = 10)
   }
 }

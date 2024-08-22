@@ -47,12 +47,12 @@ get_affected_regions <- function(thres) {
       }
       
       # Get the smallest GADM regions that exist
-      regions <- suppressMessages(gadm(k, level = 3, "data"))
+      regions <- suppressMessages(gadm(k, level = 3, "data", version="3.6"))
       if (is.null(regions)) {
-        regions <- suppressMessages(gadm(k, level = 2, "data"))
+        regions <- suppressMessages(gadm(k, level = 2, "data", version="3.6"))
       }
       if (is.null(regions)) {
-        regions <- suppressMessages(gadm(k, level = 1, "data"))
+        regions <- suppressMessages(gadm(k, level = 1, "data", version="3.6"))
       }
       
       # Set as sf object
