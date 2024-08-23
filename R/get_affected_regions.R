@@ -115,6 +115,7 @@ get_affected_regions <- function(thres) {
   close(pb)
   
   # Save affected regions data
+  dir.create("data/cyclone", showWarnings = FALSE)
   saveRDS(regions_aff_all, paste0("data/cyclone/affected_regions_", thres, ".rds"))
   
   # Return affected regions dataframe

@@ -13,8 +13,8 @@ create_panels <- function(regions_aff_all, level, thres) {
   years <- data.frame(year = 1980:2015)
   
   # Create directories
-  dir.create(paste0("data/panel_plots/", level, "-", thres), showWarnings = FALSE)
-  dir.create(paste0("data/panel_dat/", level, "-", thres), showWarnings = FALSE)
+  dir.create(paste0("data/panel_plots/", level, "-", thres), showWarnings = FALSE, recursive = TRUE)
+  dir.create(paste0("data/panel_dat/", level, "-", thres), showWarnings = FALSE, recursive = TRUE)
   
   for (iso in ccodes$iso3) {
   
