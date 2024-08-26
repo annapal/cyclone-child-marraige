@@ -20,7 +20,10 @@ iso_inc <- read_excel("data/meta_dhs_mics_updated.xlsx") %>%
   filter(!is.na(include)) %>% select(iso, include)
 
 # Dataframe to store the results
-results_all <- data.frame()
+results_etwfe <- data.frame()
+results_etwfe_pt <- data.frame()
+results_etwfe_logit <- data.frame()
+results_etwfe_logit_pt <- data.frame()
 
 # Generate the results for each country
 for (i in 1:nrow(iso_inc)) {
@@ -45,6 +48,14 @@ for (i in 1:nrow(iso_inc)) {
   
   # Run ETWFE model
   result <- run_etwfe(dat_all, adm_level, iso)
-  results_all <- rbind(results_all, result) # Store the results
+  results_etwfe <- rbind(results_etwfe, result) # Store the results
+  result_pt <- run_etwfe_pt(dat_all, adm_level, iso) # Run PT test
+  results_etwfe_pt <- rbind(results_etwfe_pt, result_pt) # Store the results
+  
+  # Run ETWFE model with logit link function
+  result2 <- run_etwfe_logit(dat_all, adm_level, iso)
+  results_etwfe_logit <- rbind(results_etwfe_logit, result2) # Store the results
+  result2_pt <- run_etwfe_logit_pt(dat_all, adm_level, iso) # Run PT test
+  results_etwfe_logit_pt <- rbind(results_etwfe_logit_pt, result2_pt) # Store the results
 }
   
