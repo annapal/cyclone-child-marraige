@@ -25,6 +25,9 @@ results_etwfe_pt <- data.frame()
 results_etwfe_logit <- data.frame()
 results_etwfe_logit_pt <- data.frame()
 
+results_etwfe_adm1 <- data.frame()
+results_etwfe_logit_adm1 <- data.frame()
+
 # Generate the results for each country
 for (i in 1:nrow(iso_inc)) {
   
@@ -57,5 +60,30 @@ for (i in 1:nrow(iso_inc)) {
   results_etwfe_logit <- rbind(results_etwfe_logit, result2) # Store the results
   result2_pt <- run_etwfe_logit_pt(dat_all, adm_level, iso) # Run PT test
   results_etwfe_logit_pt <- rbind(results_etwfe_logit_pt, result2_pt) # Store the results
+  
+  # Run Adm1 analysis for countries that are analysed at Adm2 level
+  if (adm_level==2) {
+    
+    # Get the cyclone panel data
+    cy_dat2 <- readRDS(paste0("data/panel_dat/GID_", adm_level=1, "-64/", iso, ".rds"))
+    
+    # Merge dhs-mics data and cyclone data
+    dat_all2 <- suppressMessages(merge_cy_dhs_dat(dat, cy_dat2, iso, adm_level=1))
+    
+    # Run ETWFE model
+    result_1 <- run_etwfe(dat_all2, adm_level=1, iso)
+    results_etwfe_adm1 <- rbind(results_etwfe_adm1, result_1)
+    
+    # Run ETFE logit model
+    result_2 <- run_etwfe_logit(dat_all2, adm_level=1, iso)
+    results_etwfe_logit_adm1 <- rbind(results_etwfe_logit_adm1, result_2)
+  }
 }
   
+write_xlsx(results_etwfe, "results/results_etwfe.xlsx")
+write_xlsx(results_etwfe_pt, "results/results_etwfe_pt.xlsx")
+write_xlsx(results_etwfe_logit, "results/results_etwfe_logit.xlsx")
+write_xlsx(results_etwfe_logit_pt, "results/results_etwfe_logit_pt.xlsx")
+
+write_xlsx(results_etwfe_adm1, "results/results_etwfe_adm1.xlsx")
+write_xlsx(results_etwfe_logit_adm1, "results/results_etwfe_logit_adm1.xlsx")

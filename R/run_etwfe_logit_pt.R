@@ -12,8 +12,9 @@ run_etwfe_logit_pt <- function(dat_all, adm_level, iso) {
     ungroup()
   
   # Run the ETWFE model with unit-level linear trend
+  min_yr <- min(dat_all$year)
   if (adm_level==2) {
-    mod <- feglm(married ~ cyclone2:i(cohort, i.year, ref=1, ref2=1980)/
+    mod <- feglm(married ~ cyclone2:i(cohort, i.year, ref=1, ref2=min_yr)/
                    (age_dm + rural_dm) +
                    i(cohort, year, ref=1)| # Add cohort-level linear trend
                    cohort[age_turned, rural] + year[age_turned, rural],
@@ -21,7 +22,7 @@ run_etwfe_logit_pt <- function(dat_all, adm_level, iso) {
                  vcov=~GID_2, weights=~Denorm_Wt,
                  mem.clean=TRUE, notes = FALSE)
   } else {
-    mod <- feglm(married ~ cyclone2:i(cohort, i.year, ref=1, ref2=1980)/
+    mod <- feglm(married ~ cyclone2:i(cohort, i.year, ref=1, ref2=min_yr)/
                    (age_dm + rural_dm) +
                    i(cohort, year, ref=1)| # Add cohort-level linear trend
                    cohort[age_turned, rural] + year[age_turned, rural],

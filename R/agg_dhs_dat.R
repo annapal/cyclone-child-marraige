@@ -1,6 +1,6 @@
-
-# Aggregate the DHS data
-
+# 
+# # Aggregate the DHS data
+# 
 # # Calculate normalised weight
 # dat_all$Norm_wt <- dat_all$Denorm_Wt * (nrow(dat_all)/sum(dat_all$Denorm_Wt))
 # 
@@ -13,7 +13,7 @@
 #     pop = sum(Norm_wt),
 #     married = sum(married * Norm_wt),
 #     avg_age = weighted.mean(age_turned, Norm_wt),
-#     prop_rural = weighted.mean(rural, Norm_wt) 
+#     prop_rural = weighted.mean(rural, Norm_wt)
 #   ) %>%
 #   ungroup()
   
