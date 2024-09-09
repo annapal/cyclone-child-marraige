@@ -6,7 +6,8 @@
 get_affected_regions <- function(thres) {
   
   # Country codes where DHS-MICS data are available
-  ccodes <- read_excel("data/country-codes.xlsx")
+  ccodes <- read_excel("data/meta_dhs_mics_updated.xlsx") %>%
+    filter(!is.na(include))
   
   # TC-DAT files
   files <- list.files("data/TC_data/")
@@ -14,26 +15,24 @@ get_affected_regions <- function(thres) {
   # Dataframe to store region data
   regions_aff_all <- data.frame()
   
-  # Create a progress bar
-  pb <- txtProgressBar(min = 0, max = length(files), style = 3)
-  
   for (i in 1:length(files)) {
     
     # Get file name
     file_name <- files[i]
     
-    # Read in the TC data for cyclone track
-    data <- read.csv(paste0("data/TC_data/", file_name)) %>%
-      filter(windspeed>=thres)
-    
-    # Extract year and iso codes of countries
+    # Extract year of track
     year <- as.numeric(substr(file_name, 1, 4))
-    iso <- unique(data$ISO)
     
     # If the year is pre 1980, move to the next
     if (year<1980) {
       next
     }
+    
+    # Read in the TC data for cyclone track
+    data <- read.csv(paste0("data/TC_data/", file_name)) %>%
+      filter(windspeed>=thres)
+    
+    iso <- unique(data$ISO)
     
     # Remove countries that aren't available
     iso <- intersect(iso, country_codes()$ISO3)
@@ -42,7 +41,7 @@ get_affected_regions <- function(thres) {
     for (k in iso) {
       
       # If there's no DHS-MICS data for that country, then pass
-      if (!(k %in% ccodes$iso3)) {
+      if (!(k %in% ccodes$iso)) {
         next
       }
       
@@ -106,13 +105,7 @@ get_affected_regions <- function(thres) {
       # Add to dataframe
       regions_aff_all <- rbind(regions_aff_all, regions_aff)
     }
-    
-    # Update the progress bar
-    setTxtProgressBar(pb, i)
   }
-  
-  # Close the progress bar
-  close(pb)
   
   # Save affected regions data
   dir.create("data/cyclone", showWarnings = FALSE)

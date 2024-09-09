@@ -1,43 +1,33 @@
 
 # Function that creates panel data
 # `regions_aff_all` is created from the function `get_affected_regions`
-# Level is a string that indicates the administrative level to create the panel
-# E.g. level="GID_1" for the first administrative division
 
-create_panels <- function(regions_aff_all, level, thres) {
+create_panels <- function(regions_aff_all) {
 
   # Country codes where DHS-MICS data are available
-  ccodes <- read_excel("data/country-codes.xlsx")
-  
-  # Years of cyclone data
-  years <- data.frame(year = 1980:2015)
+  ccodes <- read_excel("data/meta_dhs_mics_updated.xlsx") %>%
+    filter(!is.na(include))
   
   # Create directories
-  dir.create(paste0("data/panel_plots/", level, "-", thres), showWarnings = FALSE, recursive = TRUE)
-  dir.create(paste0("data/panel_dat/", level, "-", thres), showWarnings = FALSE, recursive = TRUE)
+  dir.create("data/panel_plots/", showWarnings = FALSE, recursive = TRUE)
+  dir.create("data/panel_dat/", showWarnings = FALSE, recursive = TRUE)
   
-  for (iso in ccodes$iso3) {
-  
-    # If there's no affected regions in this country, skip it
-    if (!(iso %in% regions_aff_all$GID_0)) {
-      next
-    }
+  for (i in 1:nrow(ccodes)) {
+    
+    iso <- ccodes$iso[i] # country code
+    lvl <- substr(ccodes$include[i], 4, 4) # Administrative level
+    level <- paste0("GID_", lvl) # Region level code
     
     # Get GADM regions
-    lvl <- as.numeric(substr(level, 5,5))
     regions <- gadm(iso, level = lvl, "data", version="3.6")
-    
-    # If regions are not available at this level, skip it
-    if (is.null(regions)) {
-      next
-    }
     
     # Set as sf object & remove geometry
     regions <- st_as_sf(regions)
     regions <- st_drop_geometry(regions) # Improves efficiency for now
     
     # Create panel data for 1980-2015
-    panel_dat <- regions %>% crossing(years)
+    year <- ccodes$start_yr[i]:ccodes$end_yr[i]
+    panel_dat <- regions %>% crossing(year)
     
     # Extract affected regions for country & select relevant columns
     regions_aff <- regions_aff_all %>% filter(GID_0==iso) %>%
@@ -45,13 +35,13 @@ create_panels <- function(regions_aff_all, level, thres) {
       distinct()
     
     # Merge affected regions with panel data
-    panel_dat_merged <- left_join(panel_dat, regions_aff)
+    panel_dat_merged <- suppressMessages(left_join(panel_dat, regions_aff))
     
     # Fix cyclone variable
     panel_dat_merged$cyclone <- ifelse(is.na(panel_dat_merged$cyclone), 0, panel_dat_merged$cyclone)
     
     # Save the panel data
-    saveRDS(panel_dat_merged, paste0("data/panel_dat/", level, "-", thres, "/", iso, ".rds"))
+    saveRDS(panel_dat_merged, paste0("data/panel_dat/", iso, ".rds"))
     
     # Plot the panel for country
     panel_dat_merged$cyclone_plot <- factor(panel_dat_merged$cyclone, levels = c(0, 1), labels = c("No Cyclone", "Cyclone"))
@@ -63,7 +53,7 @@ create_panels <- function(regions_aff_all, level, thres) {
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
     
     # Save the panel plot
-    ggsave(paste0("data/panel_plots/", level, "-", thres, "/", iso, ".jpeg"), plot,
+    ggsave(paste0("data/panel_plots/", iso, ".jpeg"), plot,
            height = 6, width = 10)
   }
 }
