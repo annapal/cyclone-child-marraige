@@ -21,6 +21,9 @@ results_etwfe_pt <- data.frame()
 results_etwfe_logit <- data.frame()
 results_etwfe_logit_pt <- data.frame()
 
+# Create directory to store data
+dir.create("data/merged_dat", showWarnings = FALSE)
+
 # Generate the results for each country
 for (i in 1:nrow(iso_inc)) {
   
@@ -48,12 +51,15 @@ for (i in 1:nrow(iso_inc)) {
   # Merge dhs-mics data and cyclone data
   dat_all <- suppressMessages(merge_cy_dhs_dat(dat, cy_dat, iso, adm_level))
   
+  # Save a copy of this data
+  saveRDS(dat_all, file=paste0("data/merged_dat/", iso, ".rds"))
+  
   # Run ETWFE model
   result <- run_etwfe(dat_all, adm_level, iso)
   results_etwfe <- rbind(results_etwfe, result) # Store the results
   result_pt <- run_etwfe_pt(dat_all, adm_level, iso) # Run PT test
   results_etwfe_pt <- rbind(results_etwfe_pt, result_pt) # Store the results
-  
+
   # Run ETWFE model with logit link function
   result2 <- run_etwfe_logit(dat_all, adm_level, iso)
   results_etwfe_logit <- rbind(results_etwfe_logit, result2) # Store the results
