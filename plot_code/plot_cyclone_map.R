@@ -20,6 +20,8 @@ for (iso in iso_inc$iso) {
 
   # Load in cyclones panel data
   dat <- readRDS(paste0("data/panel_dat/", iso, ".rds"))
+  
+  # If analysis is at the adm2 level
   if ("GID_2" %in% colnames(dat)) {
     
     # Get number of cyclones in each region
@@ -39,6 +41,7 @@ for (iso in iso_inc$iso) {
     regions_all <- rbind(regions_all, regions)
     
   } else {
+    # Analysis is at the adm1 level
     
     # Get number of cyclones in each region
     dat_cy <- dat %>% group_by(GID_1) %>%
@@ -64,7 +67,7 @@ plot <-
   geom_sf(aes(color="Excluded from study", geometry = geometry), lwd = 0) +
   scale_color_manual(values = c("Excluded from study" = "black")) +
   geom_sf(data = regions_all, aes(fill = total_cyclones, geometry = geometry), lwd = 0) + # Region fills
-  scale_fill_gradient(low = "#E6E6FA", high = "#4B0082", na.value = "grey80") +
+  scale_fill_gradient(low = "#fdecea", high = "#7f0000", na.value = "grey80") +
   ggtitle(~bold("a.")) +
   theme(panel.border = element_blank(), panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), axis.ticks = element_blank(),

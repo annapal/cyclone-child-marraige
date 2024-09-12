@@ -20,6 +20,7 @@ results_etwfe <- data.frame()
 results_etwfe_pt <- data.frame()
 results_etwfe_logit <- data.frame()
 results_etwfe_logit_pt <- data.frame()
+results_rural <- data.frame()
 
 # Create directory to store data
 dir.create("data/merged_dat", showWarnings = FALSE)
@@ -65,9 +66,14 @@ for (i in 1:nrow(iso_inc)) {
   results_etwfe_logit <- rbind(results_etwfe_logit, result2) # Store the results
   result2_pt <- run_etwfe_logit_pt(dat_all, adm_level, iso) # Run PT test
   results_etwfe_logit_pt <- rbind(results_etwfe_logit_pt, result2_pt) # Store the results
+  
+  # Run ETFW and calculate TE by rural-urban status
+  result_rural <- run_etwfe_rural(dat_all, adm_level, iso)
+  results_rural <- rbind(result_rural, results_rural)
 }
   
 write_xlsx(results_etwfe, "results/results_etwfe.xlsx")
 write_xlsx(results_etwfe_pt, "results/results_etwfe_pt.xlsx")
 write_xlsx(results_etwfe_logit, "results/results_etwfe_logit.xlsx")
 write_xlsx(results_etwfe_logit_pt, "results/results_etwfe_logit_pt.xlsx")
+write_xlsx(results_rural, "results/results_rural.xlsx")
