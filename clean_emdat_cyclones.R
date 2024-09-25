@@ -115,6 +115,7 @@ for (i in 1:nrow(iso_inc)) {
     # If cyclone event isn't in GDIS, skip
     if (cyc_subs$gdis[j]==0) next
     
+    dis_no <- cyc_subs$`Dis No`[j]
     event_no <- substr(cyc_subs$`Dis No`[j], 1, 9) # EMDAT disaster number
     event_start <- cyc_subs$`Start Year`[j] # Year of event start
     event_end <- cyc_subs$`End Year`[j] # Year of event end
@@ -129,8 +130,9 @@ for (i in 1:nrow(iso_inc)) {
         if (gdis_matched_subs$level[k]>=2) {
           treated <- c(treated, unique(gdis_matched_subs$GID_2[k]))
         } else {
-          gid1 <- gdis_matched_subs$GID_1[k]
-          treated <- c(treated, match_regions[match_regions$GID_1==gid1, "GID_2"])
+          # gid1 <- gdis_matched_subs$GID_1[k]
+          # treated <- c(treated, match_regions[match_regions$GID_1==gid1, "GID_2"])
+          emdat[emdat$`Dis No`==dis_no,"gdis"] <- 0
         }
       }
     }
@@ -162,3 +164,6 @@ for (i in 1:nrow(iso_inc)) {
   ggsave(paste0(getwd(),"/data/panel_plots_emdat/", iso, ".jpeg"),
          height = max(length(reg_names)/5, 5), width = 10)
 }
+
+# Save a copy of the updated emdat spreadsheet
+write_xlsx(emdat, path="data/emdat/emdat_updated.xlsx")
