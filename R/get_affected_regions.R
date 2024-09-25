@@ -7,7 +7,7 @@ get_affected_regions <- function(thres) {
   
   # Country codes where DHS-MICS data are available
   ccodes <- read_excel("data/meta_dhs_mics_updated.xlsx") %>%
-    filter(!is.na(include))
+    filter(level!="NA")
   
   # TC-DAT files
   files <- list.files("data/TC_data/")

@@ -5,11 +5,11 @@ source("./packages.R")
 lapply(list.files("./R", full.names = TRUE, recursive = TRUE), source)
 
 # Get affected regions
-# regions_aff_all <- get_affected_regions(thres=64)
-regions_aff_all <- readRDS("data/cyclone/affected_regions_64.rds")
+regions_aff_all <- get_affected_regions(thres=34)
+regions_aff_all <- readRDS("data/cyclone/affected_regions_34.rds")
 
 # Create panel data
-create_panels(regions_aff_all)
+create_panels(regions_aff_all, thres=34)
 
 # Get countries to include in the analysis
 iso_inc <- read_excel("data/meta_dhs_mics_updated.xlsx") %>% 
