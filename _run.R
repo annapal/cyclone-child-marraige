@@ -5,11 +5,11 @@ source("./packages.R")
 lapply(list.files("./R", full.names = TRUE, recursive = TRUE), source)
 
 # Get affected regions
-regions_aff_all <- get_affected_regions(thres=34)
-regions_aff_all <- readRDS("data/cyclone/affected_regions_34.rds")
+# regions_aff_all <- get_affected_regions(thres=64)
+regions_aff_all <- readRDS("data/cyclone/affected_regions_64.rds")
 
 # Create panel data
-create_panels(regions_aff_all, thres=34)
+create_panels(regions_aff_all, thres=64)
 
 # Get countries to include in the analysis
 iso_inc <- read_excel("data/meta_dhs_mics_updated.xlsx") %>% 
@@ -47,7 +47,8 @@ for (i in 1:nrow(iso_inc)) {
     filter(!is.na(get(paste0("Adm", adm_level))) & year%in%min_yr:max_yr)
   
   # Get the cyclone panel data
-  cy_dat <- readRDS(paste0("data/panel_dat/", iso, ".rds"))
+  cy_dat <- readRDS(paste0("data/panel_dat_64/", iso, ".rds")) %>%
+    filter(year %in% min_yr:max_yr)
   
   # Merge dhs-mics data and cyclone data
   dat_all <- suppressMessages(merge_cy_dhs_dat(dat, cy_dat, iso, adm_level))
@@ -71,6 +72,9 @@ for (i in 1:nrow(iso_inc)) {
   result_rural <- run_etwfe_rural(dat_all, adm_level, iso)
   results_rural <- rbind(result_rural, results_rural)
 }
+
+# Create directory to store results
+dir.create("results", showWarnings = FALSE)
   
 write_xlsx(results_etwfe, "results/results_etwfe.xlsx")
 write_xlsx(results_etwfe_pt, "results/results_etwfe_pt.xlsx")
