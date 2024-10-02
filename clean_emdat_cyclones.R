@@ -16,6 +16,8 @@ gdis <- gdis %>% filter(dis_no %in% emdat$`Dis No`)
 # Create variable indicating if cyclone is in GDIS
 emdat$gdis <- ifelse(emdat$`Dis No` %in% gdis$dis_no, 1, 0)
 table(emdat$gdis, useNA="always")
+emdat_no_loc <- subset(emdat, gdis==0)
+write_xlsx(emdat_no_loc, "data/emdat_no_loc.xlsx")
 
 # Match Regions to GID_1 codes ---------------------------------
 match_regions <- data.frame(GID_0 = gadm(gdis$iso3, level=1, version="3.6", path="data")$GID_0,
