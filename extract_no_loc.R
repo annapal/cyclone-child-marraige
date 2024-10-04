@@ -18,5 +18,5 @@ table(emdat$gdis, useNA="always")
 emdat_no_loc <- subset(emdat, gdis==0)
 write_xlsx(emdat_no_loc, "gdis_add/emdat_no_loc_all.xlsx")
 
-dat <- st_as_sf(gadm("GIN", level=2, version="3.6", path="data"))
+dat <- st_as_sf(gadm("NPL", level=2, version="3.6", path="data"))
 
