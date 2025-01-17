@@ -37,9 +37,9 @@ plot_rate <- function(all_dat) {
     scale_color_manual(values = c("Excluded from study" = "black")) +
     geom_sf(data = adm1_reg, aes(fill = prob, geometry = geometry), lwd = 0) + # Region fills
     geom_sf(data = adm2_reg, aes(fill = prob, geometry = geometry), lwd = 0) + # Region fills
-    scale_fill_gradient(low = "#FAF3FC", high = "#2E0854", na.value = "grey80") +
+    scale_fill_gradient(low = "#F9FFFA", high = "#004D1A", na.value = "grey80") +
     ggtitle(~bold("a.")) +
-    labs(fill = "Average annual probability of marriage", color = "") +
+    labs(fill = "Rate of child marriage", color = "") +
     theme(panel.border = element_blank(), panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(), axis.ticks = element_blank(),
           axis.text = element_blank(),

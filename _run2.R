@@ -5,7 +5,8 @@ source("./packages.R")
 lapply(list.files("./R", full.names = TRUE, recursive = TRUE), source)
 
 # create_dhsmics_meta_data() # Create DHS/MICS meta data
-avg_windspeed() # Calculate average windspeed in each subnat region
+# avg_windspeed() # Calculate average windspeed in each subnat region
 
-all_dat <- combine_data()
+# all_dat <- combine_data()
+all_dat <- readRDS("data/all_dat.rds")
 plot_rate(all_dat)
