@@ -40,25 +40,28 @@ create_panels <- function() {
     
     # Make the plot
     plot <- ggplot(wind_iso, aes(x = year, y = gid, fill = windsp_ms)) +
-      geom_tile() +
-      scale_fill_gradient2(
-        low = "white",
-        mid = "blue",
-        high = "red",
-        midpoint = 50,
+      geom_tile(color="white") +
+      scale_fill_gradientn(
+        colors = c("white", "#2166AC", "#B2182B"),
+        values = scales::rescale(c(0, 40, 80)),
+        na.value = "grey80",
       ) +
-      labs(x = "Year", y = "Subnational Administrative Region", title = paste0(iso3, ": Wind Speed (m/s)")) +
+      labs(x = "Year", y = "Subnational Region", 
+           title = countrycode(iso3, "iso3c", "country.name"),
+           fill = "Avg. windspeed (m/s)") +
       theme_minimal() +
-      scale_x_continuous(limits=c(1979, 2016), expand = c(0, 0)) +
+      scale_x_continuous(limits=c(1979, 2016), expand = c(0, 0),
+                         breaks = seq(1980, 2015, by=5)) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1),
             axis.text.y = element_blank(),
+            panel.border = element_rect(color = "black", fill = NA, linewidth = 0.25),
             panel.grid.major = element_blank())
     
     # Save the panel plot
     ggsave(paste0("data/panel_plots/", iso3, "_panel.jpeg"), plot  = plot,
            # height = max(length(unique(wind_iso$gid))/10, 5), 
-           height = 6,
-           width = 8)
+           height = 5,
+           width = 7)
   }
 
 }

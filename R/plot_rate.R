@@ -37,7 +37,7 @@ plot_rate <- function(all_dat) {
     scale_color_manual(values = c("Excluded from study" = "black")) +
     geom_sf(data = adm1_reg, aes(fill = prob, geometry = geometry), lwd = 0) + # Region fills
     geom_sf(data = adm2_reg, aes(fill = prob, geometry = geometry), lwd = 0) + # Region fills
-    scale_fill_gradient(low = "#F9FFFA", high = "#004D1A", na.value = "grey80") +
+    scale_fill_gradient(low = "#FBF8FC", high = "#762A83", na.value = "grey80") +
     ggtitle(~bold("a.")) +
     labs(fill = "Rate of child marriage", color = "") +
     theme(panel.border = element_blank(), panel.grid.major = element_blank(),
@@ -46,7 +46,7 @@ plot_rate <- function(all_dat) {
           panel.background = element_blank()) +
     geom_sf(fill = NA, color = "black", lwd = 0.1) + # Add country borders
     coord_sf(xlim = c(-85, 140), ylim = c(-40, 50))
-  
+
   # Save the plot
   ggsave("figures/prob_map.jpeg", plot, width = 9, height = 4, dpi= 600)
 }
