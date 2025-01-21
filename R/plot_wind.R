@@ -1,6 +1,5 @@
 
-plot_wind <- function() {
-  wind_dat <- readRDS("data/wind_dat_all.rds")
+plot_wind <- function(wind_dat) {
   
   summed_data <- wind_dat %>%
     group_by(iso, country, gid, level) %>%
@@ -43,4 +42,22 @@ plot_wind <- function() {
   # Save the plot
   ggsave("figures/wind_map.jpeg", plot, width = 9, height = 4, dpi= 600)
   
+  # Wind data histogram
+  ggplot(wind_dat[wind_dat$windsp_ms != 0, ], aes(x = windsp_ms)) +
+    geom_histogram(binwidth = 1, fill = "steelblue", color = "white", alpha = 0.8) +
+    labs(
+      x = "Average wind speed (m/s)",
+      y = "Frequency"
+    ) +
+    scale_x_continuous(expand = c(0.02, 0.02)) +
+    scale_y_continuous(expand = c(0.02, 0.02)) +
+    theme_minimal() +
+    theme(
+      axis.line = element_line(color = "black", linewidth = 0.25),
+      panel.grid = element_blank(),
+      axis.ticks.y = element_line(color = "black"),
+    )
+  
+  # Save the panel plot
+  ggsave("figures/windspeed.jpeg", height = 3, width = 4)
 }
