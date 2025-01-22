@@ -13,3 +13,5 @@ plot_rate(all_dat)
 create_panels()
 wind_dat <- readRDS("data/wind_dat_all.rds")
 plot_wind(wind_dat)
+
+run_analysis(all_dat, wind_dat)

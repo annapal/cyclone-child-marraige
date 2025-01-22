@@ -44,6 +44,7 @@ create_panels <- function() {
       scale_fill_gradientn(
         colors = c("white", "#2166AC", "#B2182B"),
         values = scales::rescale(c(0, 40, 80)),
+        limits = c(0, 75),
         na.value = "grey80",
       ) +
       labs(x = "Year", y = "Subnational Region", 
