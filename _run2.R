@@ -9,9 +9,9 @@ lapply(list.files("./R", full.names = TRUE, recursive = TRUE), source)
 
 # all_dat <- combine_data()
 all_dat <- readRDS("data/all_dat.rds")
-plot_rate(all_dat)
+# plot_rate(all_dat)
 create_panels()
 wind_dat <- readRDS("data/wind_dat_all.rds")
-plot_wind(wind_dat)
+# plot_wind(wind_dat)
 
 run_analysis(all_dat, wind_dat)

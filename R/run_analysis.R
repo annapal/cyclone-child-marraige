@@ -58,7 +58,7 @@ run_analysis <- function(all_dat, wind_dat) {
     curve_results <- data.frame(coefs = windsp_coeffs, se = windsp_se,
                                 lb = windsp_coeffs - 2*windsp_se,
                                 ub = windsp_coeffs + 2*windsp_se,
-                                iso = iso_cde, type = "incremental",
+                                iso = iso_cde, type = "marginal",
                                 year = 0:3)
     
     # Get cumulative effect
@@ -83,31 +83,34 @@ run_analysis <- function(all_dat, wind_dat) {
   
   # Get country name
   results_all$country <- countrycode(results_all$iso, "iso3c", "country.name")
+  results_all$region <- countrycode(results_all$iso, "iso3c", "region")
   
   # Save the results
   write_xlsx(results_all, "results/results_all.xlsx")
   write_xlsx(si_table, "results/si_table.xlsx")
   
   # Plot the results
-  ggplot(results_all, aes(x = year, y = coefs, color = type)) +
-    geom_line(linewidth = 1) +                             
-    geom_ribbon(aes(ymin = lb, ymax = ub, fill = type), alpha = 0.3, color = NA) +
-    geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
+  ggplot(results_all, aes(x = year, y = coefs*10000, color = type)) +
+    geom_line(linewidth = 0.8) +                             
+    geom_ribbon(aes(ymin = lb*10000, ymax = ub*10000, fill = type), alpha = 0.2, color = NA) +
+    geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.8) +
     labs(
       x = "Years since tropical cyclone",
-      y = "Coefficient"
+      y = "Annual rate of child marriage\n(per 10,000 per m/s)"
     ) +
     theme_minimal(base_size = 12) +                                   
     theme(
-      plot.title = element_text(hjust = 0.5, size = 14, face = "bold"), 
       axis.title = element_text(size = 12),
       panel.grid = element_blank(),                                    
       axis.line = element_line(color = "black")                        
     ) +
-    facet_wrap(~country, scales = "free_y")
+    facet_wrap(~country, ncol=4) +
+    coord_cartesian(ylim = c(-25, 25)) +
+    scale_color_manual(
+      values = c("#2166AC","#B2182B")
+    ) +
+    scale_fill_manual(
+      values = c("#2166AC","#B2182B")
+    )
 }
-
-
-
-
 
