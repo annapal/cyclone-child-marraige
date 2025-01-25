@@ -19,11 +19,17 @@ run_analysis <- function(all_dat, wind_dat) {
       windsp_ms_lag3 = lag(windsp_ms, 3)
     ) %>%
     ungroup() %>%
-    mutate_all(~ ifelse(is.na(.), 0, .)) # TODO: come back to this to see if correct!
+    na.omit()
+  
+  # %>%
+    # mutate_all(~ ifelse(is.na(.), 0, .)) # TODO: come back to this to see if correct!
   
   # Merge wind data with DHS data
   all_dat$gid <- ifelse(all_dat$iso3 %in% iso_adm1, all_dat$GID_1, all_dat$GID_2)
   all_dat_merged <- left_join(all_dat, wind_dat2)
+  
+  # Save merged data
+  saveRDS(all_dat_merged, "data/all_dat_merged.rds")
   
   # Main dataframe to store all the results
   results_all <- data.frame()
@@ -90,27 +96,37 @@ run_analysis <- function(all_dat, wind_dat) {
   write_xlsx(si_table, "results/si_table.xlsx")
   
   # Plot the results
-  ggplot(results_all, aes(x = year, y = coefs*10000, color = type)) +
-    geom_line(linewidth = 0.8) +                             
+  plot <- ggplot(results_all, aes(x = year, y = coefs*10000, color = type)) +
+    geom_line(linewidth = 0.5) +                             
     geom_ribbon(aes(ymin = lb*10000, ymax = ub*10000, fill = type), alpha = 0.2, color = NA) +
-    geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.8) +
+    geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.25) +
     labs(
       x = "Years since tropical cyclone",
-      y = "Annual rate of child marriage\n(per 10,000 per m/s)"
+      y = "Change in the annual rate of child marriage\n(per 10,000 per m/s)"
     ) +
-    theme_minimal(base_size = 12) +                                   
+    theme_minimal() + 
     theme(
-      axis.title = element_text(size = 12),
-      panel.grid = element_blank(),                                    
-      axis.line = element_line(color = "black")                        
+      panel.background = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      axis.text = element_text(),
+      axis.ticks.length = unit(3, "pt"),
+      axis.ticks = element_line(color = "black", linewidth = 0.25),
+      plot.title = element_text(face = "bold"),
+      panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+      strip.text = element_text(hjust = 0)
     ) +
     facet_wrap(~country, ncol=4) +
-    coord_cartesian(ylim = c(-25, 25)) +
+    coord_cartesian(ylim = c(-50, 50)) +
     scale_color_manual(
-      values = c("#2166AC","#B2182B")
+      values = c("#2166AC","#B2182B"),
+      name = "Effect Type"
     ) +
     scale_fill_manual(
-      values = c("#2166AC","#B2182B")
+      values = c("#2166AC","#B2182B"),
+      name = "Effect Type"
     )
+  
+  ggsave("figures/main.jpeg", plot = plot)
 }
 
