@@ -15,3 +15,5 @@ wind_dat <- readRDS("data/wind_dat_all.rds")
 # plot_wind(wind_dat)
 
 run_analysis(all_dat, wind_dat)
+run_analysis_het()
+run_analysis_gps()
