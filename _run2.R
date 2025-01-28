@@ -21,3 +21,4 @@ run_analysis_gps()
 
 plot_eff_het()
 plot_migration(all_dat)
+plot_missing(all_dat)
