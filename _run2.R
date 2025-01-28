@@ -14,6 +14,7 @@ plot_rate(all_dat)
 wind_dat <- readRDS("data/wind_dat_all.rds")
 plot_wind(wind_dat)
 plot_bar(wind_dat, all_dat)
+plot_panels(wind_dat)
 
 run_analysis(all_dat, wind_dat)
 run_analysis_het()
