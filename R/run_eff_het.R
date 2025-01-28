@@ -27,6 +27,7 @@ run_analysis_het <- function() {
   
   # Dataframe to store results
   coefs_all <- data.frame()
+  prop_all <- data.frame()
   
   for (iso_cde in meta_dat$iso) {
     
@@ -64,7 +65,9 @@ run_analysis_het <- function() {
     # Run rural analysis ------------------------------------------------------
     
     # Proportion of the population that is rural
-    table(dat$rural, useNA = "ifany")
+    prop_all <- rbind(prop_all, 
+                      data.frame(iso = iso_cde, type = "rural",
+                        prop = sum(dat$rural)/nrow(dat)))
     
     # Run model
     dat$rural <- as.factor(dat$rural)
@@ -90,9 +93,67 @@ run_analysis_het <- function() {
                               iso = iso_cde, type = "cumulative", strata = "rural", year = 0:3)
     coefs_all <- rbind(coefs_all, agg_results_rural)
     
+    # Run year analysis ------------------------------------------------------
+    
+    if (!(iso_cde %in% c("COL", "CRI", "NIC", "TLS", "ZWE"))) {
+      # Proportion of the population that is 2000 onwards
+      prop_all <- rbind(prop_all, 
+                        data.frame(iso = iso_cde, type = "2000-2015",
+                                   prop = length(dat$year[dat$year>1999])/nrow(dat)))
+      
+      # Run model
+      dat$yr_2000 <- factor(ifelse(dat$year>1999, 1, 0))
+      mod <- feols(married ~ windsp_ms*yr_2000 + windsp_ms_lag1*yr_2000 + windsp_ms_lag2*yr_2000 + windsp_ms_lag3*yr_2000 +
+                     i(gid_cde, year, ref=1)|
+                     gid + year + age_turned + rural,
+                   data=dat, vcov=~gid, weights=~Denorm_Wt)
+      
+      # Get post 2000 coefficients
+      coefficients <- coef(mod)
+      windsp_vars <- grepl("yr_20001", names(coefficients)) & grepl("windsp_ms", names(coefficients))
+      windsp_coeffs <- coefficients[windsp_vars]
+      vcov_matrix <- vcov(mod)
+      windsp_vcov <- vcov_matrix[windsp_vars, windsp_vars]
+      aggregated_coeff <- cumsum(windsp_coeffs)
+      block_cumsum <- sapply(1:nrow(windsp_vcov), function(k) {
+        sum(windsp_vcov[1:k, 1:k])
+      })
+      aggregated_se <- sqrt(block_cumsum)
+      agg_results_2000 <- data.frame(coefs = aggregated_coeff, se = aggregated_se,
+                                     lb = aggregated_coeff - 2*aggregated_se,
+                                     ub = aggregated_coeff + 2*aggregated_se,
+                                     iso = iso_cde, type = "cumulative", strata = "post-2000", year = 0:3)
+      coefs_all <- rbind(coefs_all, agg_results_2000)
+      
+      # Get coefficients for pre-2000
+      coefficients <- coef(mod)
+      windsp_vars <- !(grepl("yr_20001", names(coefficients))) & grepl("windsp_ms", names(coefficients))
+      windsp_coeffs <- coefficients[windsp_vars]
+      vcov_matrix <- vcov(mod)
+      windsp_vcov <- vcov_matrix[windsp_vars, windsp_vars]
+      aggregated_coeff <- cumsum(windsp_coeffs)
+      block_cumsum <- sapply(1:nrow(windsp_vcov), function(k) {
+        sum(windsp_vcov[1:k, 1:k])
+      })
+      aggregated_se <- sqrt(block_cumsum)
+      agg_results_1999 <- data.frame(coefs = aggregated_coeff, se = aggregated_se,
+                                     lb = aggregated_coeff - 2*aggregated_se,
+                                     ub = aggregated_coeff + 2*aggregated_se,
+                                     iso = iso_cde, type = "cumulative", strata = "pre-2000", year = 0:3)
+      coefs_all <- rbind(coefs_all, agg_results_1999)
+    }
+    
     # Run frequency of exposure analysis --------------------------------------
     
     dat$quartile <- factor(dat$quartile, levels = c(2,1,0))
+    
+    prop_all <- rbind(prop_all, 
+                      data.frame(iso = iso_cde, type = "Q2",
+                                 prop = sum(dat$quartile==2)/nrow(dat)))
+    prop_all <- rbind(prop_all, 
+                      data.frame(iso = iso_cde, type = "Q1",
+                                 prop = sum(dat$quartile==1)/nrow(dat)))
+    
     mod <- feols(married ~ windsp_ms*quartile + windsp_ms_lag1*quartile + windsp_ms_lag2*quartile + windsp_ms_lag3*quartile +
                    i(gid_cde, year, ref=1)|
                    gid + year + age_turned + rural,
@@ -133,6 +194,10 @@ run_analysis_het <- function() {
     coefs_all <- rbind(coefs_all, agg_results_q2)
   }
   
+  # Save the results
+  write_xlsx(coefs_all, "results/coefs_all_het.xlsx")
+  write_xlsx(prop_all, "results/prop_all_het.xlsx")
+  
   # Get country name
   coefs_all$country <- countrycode(coefs_all$iso, "iso3c", "country.name")
   coefs_all$region <- countrycode(coefs_all$iso, "iso3c", "region")
@@ -170,6 +235,40 @@ run_analysis_het <- function() {
       name = "Strata"
     )
   ggsave("figures/main_rural.jpeg")
+  
+  # Plot the results pre and post 2000
+  coefs_all_2000 <- subset(coefs_all, strata %in% c("all", "pre-2000", "post-2000"))
+  ggplot(coefs_all_2000, aes(x = year, y = coefs*10000, color = strata)) +
+    geom_line(linewidth = 0.5) +                             
+    geom_ribbon(aes(ymin = lb*10000, ymax = ub*10000, fill = strata), alpha = 0.2, color = NA) +
+    geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.25) +
+    labs(
+      x = "Years since tropical cyclone",
+      y = "Change in the annual rate of child marriage\n(per 10,000 per m/s)"
+    ) +
+    theme_minimal() + 
+    theme(
+      panel.background = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      axis.text = element_text(),
+      axis.ticks.length = unit(3, "pt"),
+      axis.ticks = element_line(color = "black", linewidth = 0.25),
+      plot.title = element_text(face = "bold"),
+      panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+      strip.text = element_text(hjust = 0)
+    ) +
+    facet_wrap(~country, ncol=4) +
+    coord_cartesian(ylim = c(-50, 50)) +
+    scale_color_manual(
+      values = c("black","blue", "orange"),
+      name = "Strata"
+    ) +
+    scale_fill_manual(
+      values = c("black","blue", "orange"),
+      name = "Strata"
+    )
+  ggsave("figures/main_2000.jpeg")
   
   # Plot the results by exposure
   coefs_all_q <- subset(coefs_all, strata %in% c("all", "Q1", "Q2"))

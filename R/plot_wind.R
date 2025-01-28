@@ -26,8 +26,8 @@ plot_wind <- function(wind_dat) {
     geom_sf(data = adm1_reg, aes(fill = total_windsp_ms, geometry = geometry), lwd = 0) + # Region fills
     geom_sf(data = adm2_reg, aes(fill = total_windsp_ms, geometry = geometry), lwd = 0) + # Region fills
     scale_fill_gradientn(
-      colors = c("#FFF8ED", "#2166AC", "#B2182B"),
-      values = scales::rescale(c(0, 500, 1300)),
+      colors = c("#E3F2FD", "#2166AC", "#800000"),
+      values = scales::rescale(c(0, 250, 1300)),
       na.value = "grey80",
     ) +
     ggtitle(~bold("b.")) +
