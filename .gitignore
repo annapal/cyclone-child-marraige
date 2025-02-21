@@ -12,3 +12,4 @@ data/avg_windspeed/*
 *.shp
 *.shx
 *.tif
+*.png

@@ -1,26 +1,44 @@
 
+
+# Calculate which regions are coastal -------------------------------------
+
 meta_dat <- read_excel("data/meta_dhs_mics_updated.xlsx") %>% filter(exclude==0)
+
 # Get subnational regions from the GADM
-reg_adm1 <- gadm(country_codes()$ISO3, level=1, path="data", version="3.6")
-png("coastline_plots/reg_adm1_plot.png", width = 1000, height = 800, res = 150)  # Adjust size & resolution
-plot(reg_adm1, ylim=c(-90, 90))
-dev.off()
+reg_adm1 <- gadm(meta_dat$iso[meta_dat$level == "Adm1"], level=1, path="data", version="3.6")
+reg_adm2 <- gadm(meta_dat$iso[meta_dat$level == "Adm2"], level=2, path="data", version="3.6")
 
-# reg_adm2 <- gadm(meta_dat$iso[meta_dat$level == "Adm2"], level=2, path="data", version="3.6")
+# Convert both to sf
+reg_adm1_sf <- st_as_sf(reg_adm1)
+reg_adm2_sf <- st_as_sf(reg_adm2)
+coastline_sf <- st_as_sf(coastline)
 
-# Load coastline data
-coastline <- vect("data/ne_10m_coastline/ne_10m_coastline.shp")
-coastline <- project(coastline, crs(reg_adm1))
-png("coastline_plots/coastline.png", width = 1000, height = 800, res = 150)  # Adjust size & resolution
-plot(coastline, ylim=c(-90, 90))
-dev.off()
+# Calculate intersections
+intersects_matrix <- st_intersects(reg_adm1_sf, coastline_sf, sparse = TRUE)
+intersects_matrix_2 <- st_intersects(reg_adm2_sf, coastline_sf, sparse = TRUE)
 
-# Identify coastal regions
-coastline_buffer <- buffer(coastline, width = 5000)
-reg_adm1$is_coastal <- as.integer(relate(reg_adm1, coastline_buffer, "intersects"))
-# reg_adm2$is_coastal <- as.integer(lengths(intersect(reg_adm2, coast_buffer)) > 0)
+# Convert to binary (1 = coastal, 0 = non-coastal)
+reg_adm1_sf$is_coastal <- as.integer(lengths(intersects_matrix) > 0)
+reg_adm2_sf$is_coastal <- as.integer(lengths(intersects_matrix_2) > 0)
 
-png("coastline_plots/coastline_regions.png", width = 1000, height = 800, res = 150)  # Adjust size & resolution
-plot(reg_adm1, "is_coastal", col = c("gray80", "blue"), main = "Coastal Regions")
-dev.off()
+# # Plot the regions to check
+# plot <- ggplot() +
+#   geom_sf(data = reg_adm1_sf, aes(fill = is_coastal), color = "black", linewidth = 0.05) +  # Admin regions
+#   geom_sf(data = coastline_sf, color = "blue", linewidth = 0.05) +  # Coastline
+#   ggtitle("GADM Regions & Coastline") +
+#   theme_minimal()
+# ggsave("coastline_plots/all_coastal.jpeg", plot=plot, dpi=1000)
+# 
+# plot <- ggplot() +
+#   geom_sf(data = reg_adm2_sf, aes(fill = is_coastal), color = "black", linewidth = 0.05) +  # Admin regions
+#   geom_sf(data = coastline_sf, color = "blue", linewidth = 0.05) +  # Coastline
+#   ggtitle("GADM Regions & Coastline") +
+#   theme_minimal()
+# ggsave("coastline_plots/all_coastal_2.jpeg", plot=plot, dpi=1000)
+
+# Read in the data
+all_dat_merged <- readRDS("data/all_dat_merged.rds")
+wind_dat <- readRDS("data/wind_dat_all.rds")
+
+
 
