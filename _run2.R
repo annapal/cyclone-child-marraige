@@ -22,6 +22,7 @@ run_analysis_gps()
 run_analysis_max(all_dat, wind_dat_max)
 run_analysis_binary(all_dat, wind_dat)
 run_analysis_cat(all_dat, wind_dat_cat)
+run_coastal()
 
 plot_child_marriage(all_dat)
 plot_avg_windspeed()
