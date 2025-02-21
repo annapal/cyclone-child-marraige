@@ -43,9 +43,28 @@ avg_windspeed <- function() {
     reg_adm2$avg_windspeed <- average_windspeed_adm2$mean
     
     # Save files
-    writeVector(reg_adm1, paste0("data/avg_windspeed/avg_windspeed_", year, "_adm1.shp"), filetype = "ESRI Shapefile")
-    writeVector(reg_adm2, paste0("data/avg_windspeed/avg_windspeed_", year, "_adm2.shp"), filetype = "ESRI Shapefile")
-    writeRaster(rasterized, paste0("data/avg_windspeed/windspeed_", year, ".tif"), filetype = "GTiff", overwrite = TRUE)
+    writeVector(reg_adm1, paste0("data/avg_windspeed/avg_windspeed_", year, "_adm1.shp"), 
+                filetype = "ESRI Shapefile", overwrite = TRUE)
+    writeVector(reg_adm2, paste0("data/avg_windspeed/avg_windspeed_", year, "_adm2.shp"), 
+                filetype = "ESRI Shapefile", overwrite = TRUE)
+    writeRaster(rasterized, paste0("data/avg_windspeed/windspeed_", year, ".tif"), 
+                filetype = "GTiff", overwrite = TRUE)
+    
+    # Calculate max windspeed within each polygon in reg_adm1
+    max_windspeed_adm1 <- terra::extract(rasterized, reg_adm1, fun = max, na.rm = TRUE)
+    reg_adm1$max_windspeed <- max_windspeed_adm1$mean
+    
+    # Calculate max windspeed within each polygon in reg_adm2
+    max_windspeed_adm2 <- terra::extract(rasterized, reg_adm2, fun = max, na.rm = TRUE)
+    reg_adm2$max_windspeed <- max_windspeed_adm2$mean
+    
+    # Save files
+    writeVector(reg_adm1, paste0("data/max_windspeed/max_windspeed_", year, "_adm1.shp"), 
+                filetype = "ESRI Shapefile", overwrite = TRUE)
+    writeVector(reg_adm2, paste0("data/max_windspeed/max_windspeed_", year, "_adm2.shp"), 
+                filetype = "ESRI Shapefile", overwrite = TRUE)
+    writeRaster(rasterized, paste0("data/max_windspeed/windspeed_", year, ".tif"), 
+                filetype = "GTiff", overwrite = TRUE)
     
     print(paste0("Complete: ", year))
   }

@@ -6,3 +6,9 @@ data/avg_windspeed/*
 *.rds
 *.jpeg
 .Rhistory
+*.cpg
+*.dbf
+*.prj
+*.shp
+*.shx
+*.tif
