@@ -14,6 +14,7 @@ plot_eff_het <- function() {
   coefs_all_plot$strata <- factor(coefs_all_plot$strata)
   coefs_all_plot$strata <- fct_recode(
     coefs_all_plot$strata,
+    "coastal" = "coastal",
     "post-2000" = "post-2000",
     "pre-2000" = "pre-2000",
     "high exposure" = "Q2",
@@ -21,7 +22,7 @@ plot_eff_het <- function() {
     "rural" = "rural",
     "overall" = "all"
   )
-  coefs_all_plot$strata <- fct_relevel(coefs_all_plot$strata,
+  coefs_all_plot$strata <- fct_relevel(coefs_all_plot$strata, "coastal",
                                        "post-2000", "pre-2000", "high exposure",
                                        "low exposure", "rural", "overall")
   
@@ -46,6 +47,6 @@ plot_eff_het <- function() {
       legend.position = "none"
     ) +
     ggforce::facet_wrap_paginate(~country, scales = "fixed", ncol = 4, labeller = labeller(country = label_wrap_gen(width = 20))) +
-    scale_color_manual(values = c("#D55E00", "#E69F00", "#08306B", "#80B1D3", "#800000", "#000000"))
-  ggsave("figures/main_eff_het.jpeg", plot)
+    scale_color_manual(values = c("#009E73", "#D55E00", "#E69F00", "#08306B", "#80B1D3", "#800000", "#000000"))
+  ggsave("figures/main_eff_het.jpeg", plot, height=8)
 }
