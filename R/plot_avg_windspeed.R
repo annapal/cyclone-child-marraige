@@ -18,6 +18,22 @@ plot_avg_windspeed <- function() {
     filter(year > 1982) %>%
     mutate(country = factor(country, levels = rev(unique(country))))
   
+  # Add regions
+  agg_data_filtered$region <- countrycode(agg_data_filtered$iso3, origin = "iso3c", destination = "region")
+  agg_data_filtered <- rbind(agg_data_filtered,
+                             data.frame(
+                               iso3 = "AAA",
+                               year = NA,
+                               windsp = NA,
+                               country = paste("**", unique(agg_data_filtered$region), "**", sep=""),
+                               region = unique(agg_data_filtered$region)))
+  
+  # Order the data
+  agg_data_filtered <- agg_data_filtered %>%
+    arrange(region, iso3)
+  agg_data_filtered$country <- factor(agg_data_filtered$country, levels = unique(agg_data_filtered$country))
+  
+  # Create the plot
   ggplot(agg_data_filtered, aes(x = year, y = fct_rev(country), fill = windsp)) +
     geom_tile() +
     scale_fill_viridis_c(name = "Wind speed (m/s)", option = "D") +
@@ -26,9 +42,10 @@ plot_avg_windspeed <- function() {
     theme_minimal(base_size = 14) +
     theme(
       axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 12, color = "black"),
-      axis.text.y = element_text(size = 12, color = "black"),
+      axis.text.y = ggtext::element_markdown(size = 12, color = "black"),
       axis.title = element_text(size = 14),
-      axis.ticks = element_line(color = "black", linewidth = 0.5),
+      axis.ticks.x = element_line(color = "black", linewidth = 0.5),
+      axis.ticks.y = element_blank(),
       legend.position = "right",
       legend.title = element_text(size = 12),
       legend.text = element_text(size = 10),
