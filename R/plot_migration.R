@@ -28,6 +28,11 @@ plot_migration <- function(all_dat) {
     mutate(country = countrycode(iso3, "iso3c", "country.name")) %>%
     mutate(country = fct_rev(as.factor(country))) # Reverse the order of countries
   
+  # Calculate proportion with GPS data
+  proportions_gps <- all_dat %>%
+    filter(!is.na(lat))
+  nrow(proportions_gps)/nrow(all_dat)
+  
   # Exclude countries where analysis was done at the Adm2 level
   proportions <- proportions %>% filter(iso3 %in% meta_dat$iso & !(iso3 %in% c("BGD", "MDG", "PAK")))
   

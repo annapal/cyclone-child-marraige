@@ -131,7 +131,7 @@ run_analysis_binary <- function(all_dat, wind_dat) {
     geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.25) +
     labs(
       x = "Years since tropical cyclone",
-      y = "Change in the annual rate of child marriage\n(per 10,000 per m/s)"
+      y = "Change in the annual rate of child marriage\n(per 10,000)"
     ) +
     theme_minimal() + 
     theme(

@@ -26,6 +26,9 @@ plot_eff_het <- function() {
                                        "post-2000", "pre-2000", "high exposure",
                                        "low exposure", "rural", "overall")
   
+  # Remove some of the data
+  coefs_all_plot <- coefs_all_plot %>% filter(!(strata%in% c("low exposure", "post-2000")))
+  
   plot <- ggplot(coefs_all_plot, aes(x = coefs*10000, y = strata, color = strata)) +
     geom_point(size = 2.5, shape = 18) +
     geom_errorbarh(aes(xmin = lb*10000, xmax = ub*10000), height = 0, linewidth = 0.5) +
@@ -47,6 +50,6 @@ plot_eff_het <- function() {
       legend.position = "none"
     ) +
     ggforce::facet_wrap_paginate(~country, scales = "fixed", ncol = 4, labeller = labeller(country = label_wrap_gen(width = 20))) +
-    scale_color_manual(values = c("#009E73", "#D55E00", "#E69F00", "#08306B", "#80B1D3", "#800000", "#000000"))
+    scale_color_manual(values = c("#009E73", "#D55E00",  "#08306B", "#800000", "#000000"))
   ggsave("figures/main_eff_het.jpeg", plot, height=8)
 }
