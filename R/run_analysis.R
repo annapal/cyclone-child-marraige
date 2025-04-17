@@ -2,6 +2,7 @@
 # Run the analysis
 
 run_analysis <- function(all_dat, wind_dat) {
+  
   # Get meta data
   meta_dat <- read_excel("data/meta_dhs_mics_updated.xlsx") %>%
     filter(exclude==0) %>%
@@ -20,9 +21,6 @@ run_analysis <- function(all_dat, wind_dat) {
     ) %>%
     ungroup() %>%
     na.omit()
-  
-  # %>%
-    # mutate_all(~ ifelse(is.na(.), 0, .)) # TODO: come back to this to see if correct!
   
   # Merge wind data with DHS data
   all_dat$gid <- ifelse(all_dat$iso3 %in% iso_adm1, all_dat$GID_1, all_dat$GID_2)
@@ -127,6 +125,7 @@ run_analysis <- function(all_dat, wind_dat) {
       name = "Effect Type"
     )
   
+  # Save the figure
   ggsave("figures/main.jpeg", plot = plot)
 }
 

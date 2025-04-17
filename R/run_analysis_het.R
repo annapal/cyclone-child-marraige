@@ -1,7 +1,10 @@
 
+# Run treatment effect hetereogeneity analysis
+
 run_analysis_het <- function() {
   
   # Calculate which regions are coastal -------------------------------------
+  
   meta_dat <- read_excel("data/meta_dhs_mics_updated.xlsx") %>% filter(exclude==0)
   
   # Get subnational regions from the GADM

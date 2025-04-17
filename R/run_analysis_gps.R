@@ -1,4 +1,6 @@
 
+# Run analysis using GPS coordinates
+
 run_analysis_gps <- function() {
 
   # Get meta data

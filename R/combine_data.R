@@ -3,6 +3,7 @@
 
 combine_data <- function() {
   
+  # Read in survey meta data
   meta_dat <- read_excel("data/meta_dhs_mics_updated.xlsx")
   
   # Data frame to store all the data
@@ -10,11 +11,11 @@ combine_data <- function() {
   
   for (i in 1:nrow(meta_dat)) {
     
-    iso <- meta_dat$iso[i]
-    level <- meta_dat$level[i]
+    iso <- meta_dat$iso[i] # Country iso
+    level <- meta_dat$level[i] # Level of analysis (Adm1 or Adm2)
     
-    start_yr <- meta_dat$start_yr[i]
-    end_yr <- meta_dat$end_yr[i]
+    start_yr <- meta_dat$start_yr[i] # Start year of analysis
+    end_yr <- meta_dat$end_yr[i] # End year of analysis
     
     # Read in the DHS-MICS data
     data <- readRDS(paste0("data/dhs-mics/", iso, ".rds")) %>%

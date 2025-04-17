@@ -2,6 +2,8 @@
 # Calculate average windspeed in each subnational region using TCE-DAT
 
 avg_windspeed <- function() {
+  
+  # Get data on surveys
   meta_dat <- read_excel("data/meta_dhs_mics_updated.xlsx")
   
   # Get subnational regions from the GADM
@@ -33,6 +35,8 @@ avg_windspeed <- function() {
     points <- vect(final_data, geom = c("LON", "LAT"), crs = crs(reg_adm1))
     rasterized <- rasterize(points, global_grid, field = "windspeed", fun = mean)
     rasterized[is.na(rasterized)] <- 0
+
+    # Average windspeed in regions --------------------------------------------
     
     # Calculate average windspeed within each polygon in reg_adm1
     average_windspeed_adm1 <- terra::extract(rasterized, reg_adm1, fun = mean, na.rm = TRUE)
@@ -50,6 +54,8 @@ avg_windspeed <- function() {
     writeRaster(rasterized, paste0("data/avg_windspeed/windspeed_", year, ".tif"), 
                 filetype = "GTiff", overwrite = TRUE)
     
+    # Max windspeed in regions ------------------------------------------------
+    
     # Calculate max windspeed within each polygon in reg_adm1
     max_windspeed_adm1 <- terra::extract(rasterized, reg_adm1, fun = max, na.rm = TRUE)
     reg_adm1$max_windspeed <- max_windspeed_adm1$mean
@@ -66,6 +72,7 @@ avg_windspeed <- function() {
     writeRaster(rasterized, paste0("data/max_windspeed/windspeed_", year, ".tif"), 
                 filetype = "GTiff", overwrite = TRUE)
     
+    # Tell me its complete
     print(paste0("Complete: ", year))
   }
 }

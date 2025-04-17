@@ -1,6 +1,9 @@
 
+# Calculate the category of each storm (Saffir-Simpson Scale)
+
 storm_cat <- function() {
 
+  # Get meta data on surveys
   meta_dat <- read_excel("data/meta_dhs_mics_updated.xlsx")
   
   # Get subnational regions from the GADM
@@ -11,7 +14,7 @@ storm_cat <- function() {
   path <- "data/TC_data"
   
   for (year in 1980:2015) {
-    # Get all files that pertian to that year
+    # Get all files that pertain to that year
     files <- list.files(path, pattern = paste0("^", year), full.names = TRUE)
     combined_data <- do.call(rbind, lapply(files, function(file) {
       data <- read.csv(file)
@@ -49,7 +52,7 @@ storm_cat <- function() {
     max_cat_adm1 <- terra::extract(rasterized, reg_adm1, fun = max, na.rm = TRUE)
     reg_adm1$max_cat <- max_cat_adm1$mean
     
-    # Calculate max windspeed within each polygon in reg_adm2
+    # Calculate category within each polygon in reg_adm2
     max_cat_adm2 <- terra::extract(rasterized, reg_adm2, fun = max, na.rm = TRUE)
     reg_adm2$max_cat <- max_cat_adm2$mean
     
@@ -61,6 +64,7 @@ storm_cat <- function() {
     writeRaster(rasterized, paste0("data/cat_windspeed/windspeed_", year, ".tif"), 
                 filetype = "GTiff", overwrite = TRUE)
     
+    # Tell me its complete
     print(paste0("Complete: ", year))
   }
 }

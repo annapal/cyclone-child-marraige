@@ -32,13 +32,6 @@ plot_panels <- function(wind_dat) {
       strip.text = element_text(size = 12, face = "bold"),
       axis.text.y = element_blank()
     ) +
-    # theme(axis.text.x = element_text(angle = 90, hjust = 1),
-    #       axis.text.y = element_blank(),
-    #       axis.ticks.x = element_line(color = "black", linewidth = 0.5),
-    #       panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
-    #       panel.grid.major = element_blank(),
-    #       legend.position = "top", 
-    #       legend.justification = "center") +
     facet_wrap(~country, scales = "free_y", ncol=4)
   ggsave("figures/panel_plots.jpeg", height=10, width=8, plot=plot)
 }
